@@ -19,9 +19,11 @@ import { type Session } from "next-auth";
 
 import { getServerAuthSession } from "~/server/auth";
 import { prisma } from "~/server/db";
+import {type Transporter} from 'nodemailer'
 
 type CreateContextOptions = {
   session: Session | null;
+  emailService: Transporter<SendmailTransport.SentMessageInfo> | null;
 };
 
 /**
@@ -37,6 +39,7 @@ type CreateContextOptions = {
 const createInnerTRPCContext = (opts: CreateContextOptions) => {
   return {
     session: opts.session,
+    emailService: opts.emailService,
     prisma,
   };
 };
@@ -52,9 +55,10 @@ export const createTRPCContext = async (opts: CreateNextContextOptions) => {
 
   // Get the session from the server using the getServerSession wrapper function
   const session = await getServerAuthSession({ req, res });
-
+  
   return createInnerTRPCContext({
     session,
+    emailService  
   });
 };
 
@@ -65,6 +69,8 @@ export const createTRPCContext = async (opts: CreateNextContextOptions) => {
  */
 import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
+import emailService from "../email";
+import type SendmailTransport from "nodemailer/lib/sendmail-transport";
 
 const t = initTRPC.context<typeof createTRPCContext>().create({
   transformer: superjson,

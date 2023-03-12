@@ -38,24 +38,25 @@ const groupRouter = createTRPCRouter({
             usersToAdd: z.array(z.object({email: z.string()}))
         }))
         .mutation(({ ctx, input }) => {
-            // ctx.prisma.usersInGroups.create({data: {
-            //     role:'user',
-            //     group: { connect: {id: 'clf449m600000ull8payhhh9w'} },
-            //     user: { connect: {id: 'clf3zl7tl001sulzc6c0n5fax'} }
-            // }}).catch(e => console.error(e))
+              
+            // void ctx.emailService?.sendMail( {
+            //     to: 'seranmoreno500@gmail.com',
+            //     subject: 'Sending Email using Node.js',
+            //     text: 'yooooooooooo'
+            // })
 
-            return Promise.all([
-                ctx.prisma.groups.findFirst({where: {id: {equals: input.groupId}}}),
-                ctx.prisma.user.findMany({where: {email: { in: input.usersToAdd.map(user => user.email)}}})
-            ]).then(([group, usersToAdd]) => { 
-                usersToAdd.forEach(user => { 
-                    ctx.prisma.usersInGroups.create({data: {
-                        role:'user',
-                        group: { connect: {id: group?.id} },
-                        user: { connect: {id: user?.id} }
-                    }}).catch(e => console.error(e))
-                })
-            }).catch(e => console.error(e))
+            // return Promise.all([
+            //     ctx.prisma.groups.findFirst({where: {id: {equals: input.groupId}}}),
+            //     ctx.prisma.user.findMany({where: {email: { in: input.usersToAdd.map(user => user.email)}}})
+            // ]).then(([group, usersToAdd]) => { 
+            //     usersToAdd.forEach(user => { 
+            //         ctx.prisma.usersInGroups.create({data: {
+            //             role:'user',
+            //             group: { connect: {id: group?.id} },
+            //             user: { connect: {id: user?.id} }
+            //         }}).catch(e => console.error(e))
+            //     })
+            // }).catch(e => console.error(e))
         }),
     
   });
