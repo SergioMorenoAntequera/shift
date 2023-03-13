@@ -2,12 +2,14 @@
 
 import Head from "next/head";
 import { type NextPage } from "next";
-import { signIn, signOut, useSession } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import { api } from "~/utils/api";
+import { useRouter } from "next/router";
 
 const Home: NextPage = () => {
   const { data: sessionData } = useSession()
-  
+  const router = useRouter()
+
   const groupCreate = api.group.create.useMutation()
   const groupDelete = api.group.delete.useMutation()
   const groupAddUser = api.group.addUsers.useMutation()
@@ -32,10 +34,6 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
-        
-        <Header />
-
-        
         <div className="flex min-h-screen flex-col bg-gradient-to-b from-[#2e026d] to-[#15162c]">
           <div className="container text-white">
             
@@ -44,9 +42,11 @@ const Home: NextPage = () => {
 
             <div>
               {userGroups?.map(group => <div className="flex gap-7" key={group.id}>
-                  {group.name}
-                  <div onClick={()=> {deleteGroup(group.id)}}> DELETE </div>
-                  <div onClick={()=> {invite(group.id)}}> INVITE DISCORD ACCOUNT </div>
+                  {group.name}  {group.id}
+                  
+                  <div onClick={()=> { deleteGroup(group.id)}}> DELETE </div>
+                  <div onClick={()=> { invite(group.id)}}> INVITE DISCORD ACCOUNT </div>
+                  <div onClick={() => { void router.push(`/invitation/${group.id}`)}}> SEE invitation </div>
               </div>)}
             </div>
             
@@ -60,25 +60,3 @@ const Home: NextPage = () => {
 
 export default Home;
 
-const Header: React.FC = () => {
-  const { data:sessionData } = useSession()
-
-  return (
-    <div className="p-6 bg-neutral-500 w-full flex items-center justify-between gap-4">
-      <div className="text-white">
-        <p className="text-2xl">
-          {sessionData && <span> Hey {sessionData?.user?.name}!</span>}
-        </p>
-        <p className="text-sm">
-          {sessionData && <span> {sessionData?.user?.id} </span>}
-        </p>
-      </div>
-      <button
-        className="rounded-full bg-white/10 px-10 py-3 font-semibold text-white no-underline transition hover:bg-white/20"
-        onClick={sessionData ? () => void signOut() : () => void signIn()}
-      >
-        {sessionData ? "Sign out" : "Sign in"}
-      </button>
-    </div>
-  );
-};

@@ -2,11 +2,13 @@ import { z } from "zod";
 
 import {
     createTRPCRouter,
-    // publicProcedure,
     protectedProcedure,
+    publicProcedure,
   } from "~/server/api/trpc";
 
 const groupRouter = createTRPCRouter({
+    getAll: publicProcedure.query(({ctx}) => ctx.prisma.groups.findMany()),
+    
     create: protectedProcedure
         .input(z.object({
             name: z.string(),
@@ -45,18 +47,20 @@ const groupRouter = createTRPCRouter({
             //     text: 'yooooooooooo'
             // })
 
-            // return Promise.all([
-            //     ctx.prisma.groups.findFirst({where: {id: {equals: input.groupId}}}),
-            //     ctx.prisma.user.findMany({where: {email: { in: input.usersToAdd.map(user => user.email)}}})
-            // ]).then(([group, usersToAdd]) => { 
-            //     usersToAdd.forEach(user => { 
-            //         ctx.prisma.usersInGroups.create({data: {
-            //             role:'user',
-            //             group: { connect: {id: group?.id} },
-            //             user: { connect: {id: user?.id} }
-            //         }}).catch(e => console.error(e))
-            //     })
-            // }).catch(e => console.error(e))
+            return Promise.all([
+                ctx.prisma.groups.findFirst({where: {id: {equals: input.groupId}}}),
+                ctx.prisma.user.findMany({where: {email: { in: input.usersToAdd.map(user => user.email)}}})
+            ]).then(([group, usersToAdd]) => { 
+                
+                usersToAdd.forEach(user => { 
+                    ctx.prisma.usersInGroups.create({data: {
+                        role:'user',
+                        group: { connect: {id: group?.id} },
+                        user: { connect: {id: user?.id} }
+                    }}).catch(e => console.error(e))
+                })
+
+            }).catch(e => console.error(e))
         }),
     
   });
