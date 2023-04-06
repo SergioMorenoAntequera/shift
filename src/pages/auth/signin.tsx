@@ -8,8 +8,6 @@ export default function Signin() {
 
   useEffect(() => {
     if (status === "unauthenticated") {
-      console.log("No JWT");
-      console.log(status);
       void signIn("okta");
     } else if (status === "authenticated") {
       void router.push("/");

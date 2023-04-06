@@ -22,8 +22,8 @@ export async function getStaticProps(props: TPropsParams) {
   if(!groupId) return { props: {group: null}}
   const group = await prisma.groups.findFirst({where: {id: {equals: groupId}}})
   
-  const userInGroup = await prisma.usersInGroups.findMany({select:{ userId: true }, where: {groupId: groupId}})
-  const users = await prisma.user.findMany({where: {id: {in: userInGroup.map(u => u.userId)}}})
+  const usersInGroup = await prisma.usersInGroups.findMany({select:{ userId: true }, where: {groupId: groupId}})
+  const users = await prisma.user.findMany({where: {id: {in: usersInGroup.map(u => u.userId)}}})
 
 
   return { props: { group, users }, revalidate: 300 }

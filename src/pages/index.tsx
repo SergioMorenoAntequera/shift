@@ -12,16 +12,12 @@ const Home: NextPage = () => {
   const router = useRouter()
 
   const groupCreate = api.group.create.useMutation()
-  const groupDelete = api.group.delete.useMutation()
   const {data: userGroups} = api.user.getGroups.useQuery()
 
   const newGroupNameRef = useRef<HTMLInputElement>(null)
 
   function createGroup() {
     groupCreate.mutate(({ name: newGroupNameRef.current?.value ?? 'New Group' }))
-  }
-  function deleteGroup(groupId: string) {
-    groupDelete.mutate(({id: groupId}))
   }
 
   return (
@@ -49,8 +45,6 @@ const Home: NextPage = () => {
               
                   <div className="flex gap-7">
                     {group.id}
-                    
-                    <div onClick={()=> { deleteGroup(group.id)}}> DELETE </div>
                     <div onClick={() => { void router.push(`/group/join/${group.id}`)}}> SEE invitation </div>
                   </div>
                   
